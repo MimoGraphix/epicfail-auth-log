@@ -25,4 +25,16 @@ return [
 
     'older' => 365,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Geolocation timeout
+    |--------------------------------------------------------------------------
+    |
+    | Set the amount of time in seconds to wait for geolocation, if it exceeds
+    | this then we ignore the location for performance reasons.
+    |
+    */
+
+    'geolocation_timeout' => 2,
+
 ];

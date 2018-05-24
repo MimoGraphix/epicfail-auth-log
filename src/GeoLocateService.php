@@ -18,7 +18,12 @@ class GeoLocateService
             try {
                 $client = new GuzzleClient();
                 $url =  'https://get.geojs.io/v1/ip/geo/' . $ip . '.json';
-                $response = $client->get($url);
+                $response = $client->get($url, [
+                    'allow_redirects' => true,
+                    'connect_timeout' => config('authentication-log.geolocation_timeout'),
+                    'read_timeout' => config('authentication-log.geolocation_timeout'),
+                    'timeout' => config('authentication-log.geolocation_timeout'),
+                ]);
 
                 $responseData = (string) $response->getBody();
 
