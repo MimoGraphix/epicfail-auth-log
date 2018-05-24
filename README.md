@@ -1,3 +1,5 @@
+> Notice! This fork adds the ability to also log "location" of users using geojs.io
+
 # Laravel Authentication Log
 
 [![Build Status](https://travis-ci.org/yadahan/laravel-authentication-log.svg?branch=master)](https://travis-ci.org/yadahan/laravel-authentication-log)
