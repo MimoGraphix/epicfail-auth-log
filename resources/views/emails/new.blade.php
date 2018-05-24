@@ -5,6 +5,7 @@ Your {{ config('app.name') }} account logged in from a new device.
 
 > **Account:** {{ $account->email }}<br>
 > **Time:** {{ $time->toCookieString() }}<br>
+> **Location:** {{ $location }}<br>
 > **IP Address:** {{ $ipAddress }}<br>
 > **Browser:** {{ $browser }}
 

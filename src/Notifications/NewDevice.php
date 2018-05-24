@@ -57,6 +57,7 @@ class NewDevice extends Notification
                 'time' => $this->authenticationLog->login_at,
                 'ipAddress' => $this->authenticationLog->ip_address,
                 'browser' => $this->authenticationLog->user_agent,
+                'location' => $this->authenticationLog->location,
             ]);
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Auth\Events\Login;
 use Yadahan\AuthenticationLog\AuthenticationLog;
+use Yadahan\AuthenticationLog\GeoLocateService;
 use Yadahan\AuthenticationLog\Notifications\NewDevice;
 
 class LogSuccessfulLogin
@@ -39,12 +40,14 @@ class LogSuccessfulLogin
         $user = $event->user;
         $ip = $this->request->ip();
         $userAgent = $this->request->userAgent();
+        $location = (new GeoLocateService)->getLocationByIpAddress($ip);
         $known = $user->authentications()->whereIpAddress($ip)->whereUserAgent($userAgent)->first();
 
         $authenticationLog = new AuthenticationLog([
             'ip_address' => $ip,
             'user_agent' => $userAgent,
             'login_at' => Carbon::now(),
+            'location' => $location,
         ]);
 
         $user->authentications()->save($authenticationLog);
