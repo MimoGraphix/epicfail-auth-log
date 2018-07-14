@@ -36,5 +36,14 @@ return [
     */
 
     'geolocation_timeout' => 2,
-
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Email account validation
+    |--------------------------------------------------------------------------
+    |
+    | checks if the user has email validation and if its been validated
+    |
+    */
+    'has-email-validation' => false,
 ];
