@@ -53,7 +53,10 @@ class LogSuccessfulLogin
         $user->authentications()->save($authenticationLog);
 
         if (! $known && config('authentication-log.notify')) {
-            $user->notify(new NewDevice($authenticationLog));
+            if(config('authentication-log.has-email-validation') && $user->verified){
+                $user->notify(new NewDevice($authenticationLog));
+            }
+            else $user->notify(new NewDevice($authenticationLog));
         }
     }
 }
