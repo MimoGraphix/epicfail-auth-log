@@ -1,5 +1,5 @@
 {
-    "name": "yadahan/laravel-authentication-log",
+    "name": "mimographix/laravel-authentication-log",
     "description": "Laravel Authentication Log provides authentication logger and notification for Laravel.",
     "keywords": [
         "laravel",
