@@ -5,6 +5,7 @@ namespace Yadahan\AuthenticationLog\Listeners;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Log;
 use Yadahan\AuthenticationLog\AuthenticationLog;
 use Yadahan\AuthenticationLog\GeoLocateService;
 use Yadahan\AuthenticationLog\Notifications\NewDevice;
@@ -45,19 +46,32 @@ class LogSuccessfulLogin
         $session_key = session()->getId();
 		$location = (new GeoLocateService)->getLocationByIpAddress($ip);
 
-		$known = $user->authentications()->whereIpAddress($ip)->whereUserAgent($userAgent)->first();
+		\DB::beginTransaction();
+		try
+		{
+			$known = $user->authentications()->whereIpAddress($ip)->whereUserAgent($userAgent)->first();
 
-        $authenticationLog = new AuthenticationLog([
-            'session_key' => $session_key,
-            'ip_address' => $ip,
-            'user_agent' => $userAgent,
-            'flag_remember' => $remember,
-            'guard' => $guard,
-            'login_at' => Carbon::now(),
-            'location' => $location,
-        ]);
+			$authenticationLog = new AuthenticationLog([
+				'session_key' => $session_key,
+				'ip_address' => $ip,
+				'user_agent' => $userAgent,
+				'flag_remember' => $remember,
+				'guard' => $guard,
+				'login_at' => Carbon::now(),
+				'location' => $location,
+			]);
 
-        $user->authentications()->save($authenticationLog);
+			$user->authentications()->save($authenticationLog);
+
+			\DB::commit();
+		}
+		catch ( \Exception $e )
+		{
+			\DB::rollback();
+
+			Log::error( $e );
+			return ;
+		}
 
         if ( !$known && config('authentication-log.notify')) {
         	if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )

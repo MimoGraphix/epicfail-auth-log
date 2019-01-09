@@ -44,32 +44,58 @@ class LogAuthenticated
         $guard = $event->guard;
         $session_key = session()->getId();
 
-        $known = $user->activeAuthentications()
-			->where( 'session_key', $session_key );
-
-        if( $known->count() == 0 )
+		\DB::beginTransaction();
+		try
 		{
-        	$known = $user->activeAuthentications()
-				->where( 'ip_address', $ip )
-				->where( 'user_agent', $userAgent )
-				->where( 'guard', $guard );
+			$known = $user->activeAuthentications()
+				->where( 'session_key', $session_key );
 
-        	$known = $known->first();
-
-        	if( $known == null )
+			if( $known->count() == 0 )
 			{
-				Log::error( 'What The FUCK just happed?' );
-				return ;
+				$_known = $user->activeAuthentications()
+					->where( 'ip_address', $ip )
+					->where( 'user_agent', $userAgent )
+					->where( 'guard', $guard );
+
+				$known = $_known->first();
+
+				if( $known == null )
+				{
+					Log::error( 'What The FUCK just happed?' );
+					return ;
+				}
+
+				// Remove duplicities because for some reason it sometimes happen
+				$_known->where( 'id', '!=', $known->id )
+					->where( 'login_at', $known->login_at )
+					->delete();
+
+				$known->session_key = $session_key;
+			}
+			else
+			{
+				$known = $known->first();
+
+				$user->activeAuthentications()
+					->where( 'ip_address', $ip )
+					->where( 'user_agent', $userAgent )
+					->where( 'guard', $guard )
+					->where( 'id', '!=', $known->id )
+					->where( 'login_at', $known->login_at )
+					->delete();
 			}
 
-        	$known->session_key = $session_key;
-		}
-        else
-		{
-        	$known = $known->first();
-		}
+			$known->last_active = Carbon::now();
+			$known->save();
 
-        $known->last_active = Carbon::now();
-        $known->save();
+			\DB::commit();
+		}
+		catch ( \Exception $e )
+		{
+			\DB::rollback();
+
+			Log::error( $e );
+			return ;
+		}
     }
 }

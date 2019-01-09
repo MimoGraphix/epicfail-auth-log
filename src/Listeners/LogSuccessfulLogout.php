@@ -44,37 +44,50 @@ class LogSuccessfulLogout
 			$guard = $event->guard;
 			$session_key = session()->getId();
 
-			$authenticationLog = $user->activeAuthentications()
-				->where( 'session_key', $session_key );
-
-			if( $authenticationLog->count() == 0 )
+			\DB::beginTransaction();
+			try
 			{
 				$authenticationLog = $user->activeAuthentications()
-					->where( 'ip_address', $ip )
-					->where( 'user_agent', $userAgent )
-					->where( 'guard', $guard );
+					->where( 'session_key', $session_key );
 
-				$authenticationLog = $authenticationLog->first();
-
-				if( $authenticationLog == null )
+				if( $authenticationLog->count() == 0 )
 				{
-					$authenticationLog = new AuthenticationLog([
-						'session_key' => $session_key,
-						'ip_address' => $ip,
-						'user_agent' => $userAgent,
-						'guard' => $guard,
-						'login_at' => Carbon::now(),
-					]);
+					$authenticationLog = $user->activeAuthentications()
+						->where( 'ip_address', $ip )
+						->where( 'user_agent', $userAgent )
+						->where( 'guard', $guard );
+
+					$authenticationLog = $authenticationLog->first();
+
+					if( $authenticationLog == null )
+					{
+						$authenticationLog = new AuthenticationLog([
+							'session_key' => $session_key,
+							'ip_address' => $ip,
+							'user_agent' => $userAgent,
+							'guard' => $guard,
+							'login_at' => Carbon::now(),
+						]);
+					}
 				}
+				else
+				{
+					$authenticationLog = $authenticationLog->first();
+				}
+
+				$authenticationLog->logout_at = Carbon::now();
+
+				$user->authentications()->save($authenticationLog);
+
+				\DB::commit();
 			}
-			else
+			catch ( \Exception $e )
 			{
-				$authenticationLog = $authenticationLog->first();
+				\DB::rollback();
+
+				Log::error( $e );
+				return ;
 			}
-
-			$authenticationLog->logout_at = Carbon::now();
-
-			$user->authentications()->save($authenticationLog);
         }
     }
 }
