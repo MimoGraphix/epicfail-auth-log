@@ -39,6 +39,15 @@ class AuthenticationLog extends Model
         'logout_at' => 'datetime',
     ];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'session_key',
+    ];
+
 	private $_parsedBrowser = null;
 
 	/**
