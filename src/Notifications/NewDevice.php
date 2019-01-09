@@ -51,7 +51,7 @@ class NewDevice extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(trans('authentication-log::messages.subject'))
+            ->subject( trans( 'authentication-log.email-subject', ['app' => config('app.name') ] ))
             ->markdown( config( 'authentication-log.email-view' ), [
                 'account' => $notifiable,
                 'time' => $this->authenticationLog->login_at,
@@ -71,9 +71,9 @@ class NewDevice extends Notification
     public function toSlack($notifiable)
     {
         return (new SlackMessage)
-            ->from(config('app.name'))
+            ->from( config('app.name') )
             ->warning()
-            ->content(trans('authentication-log::messages.content', ['app' => config('app.name')]))
+            ->content(trans('authentication-log.message-content', ['app' => config('app.name')]))
             ->attachment(function ($attachment) use ($notifiable) {
                 $attachment->fields([
                     'Account' => $notifiable->email,
@@ -93,6 +93,6 @@ class NewDevice extends Notification
     public function toNexmo($notifiable)
     {
         return (new NexmoMessage)
-            ->content(trans('authentication-log::messages.content', ['app' => config('app.name')]));
+            ->content(trans('authentication-log.message-content', ['app' => config('app.name')]));
     }
 }

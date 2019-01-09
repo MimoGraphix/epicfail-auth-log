@@ -56,4 +56,18 @@ return [
     |
     */
 	'email-view' => 'authentication-log::emails.new',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Translation Keys
+    |--------------------------------------------------------------------------
+    |
+    | Translation keys to customize text in Notifications
+    | @param app = app.name
+    |
+    */
+	'email-subject' => 'authentication-log::messages.subject',
+	'message-content' => 'authentication-log::messages.content',
+
+
 ];
