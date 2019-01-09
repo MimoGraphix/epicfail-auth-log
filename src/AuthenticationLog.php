@@ -3,6 +3,7 @@
 namespace Yadahan\AuthenticationLog;
 
 use Illuminate\Database\Eloquent\Model;
+use WhichBrowser\Constants\DeviceType;
 
 class AuthenticationLog extends Model
 {
@@ -33,15 +34,66 @@ class AuthenticationLog extends Model
      * @var array
      */
     protected $casts = [
+        'last_active' => 'datetime',
         'login_at' => 'datetime',
         'logout_at' => 'datetime',
     ];
 
-    /**
+	private $_parsedBrowser = null;
+
+	/**
      * Get the authenticatable entity that the authentication log belongs to.
      */
     public function authenticatable()
     {
         return $this->morphTo();
     }
+
+	/**
+	 * @return \WhichBrowser\Parser
+	 */
+    public function parseUserAgent()
+	{
+		if( $this->_parsedBrowser )
+			return $this->_parsedBrowser;
+
+		$this->_parsedBrowser = new \WhichBrowser\Parser( $this->user_agent );
+
+		return $this->_parsedBrowser;
+	}
+
+	public function isPC()
+	{
+		return $this->parseUserAgent()->isType( DeviceType::DESKTOP );
+	}
+
+	public function isMobile()
+	{
+		return $this->parseUserAgent()->isType( DeviceType::MOBILE, DeviceType::PDA );
+	}
+
+	public function isTablet()
+	{
+		return $this->parseUserAgent()->isType( DeviceType::TABLET );
+	}
+
+    public function getOs()
+	{
+		return $this->parseUserAgent()->os->toString();
+	}
+
+    public function getBrowser()
+	{
+		return $this->parseUserAgent()->browser->toString();
+	}
+
+	public function getLocation()
+	{
+		return $this->location;
+	}
+
+	public function isActual()
+	{
+		return $this->session_key == session()->getId();
+	}
 }

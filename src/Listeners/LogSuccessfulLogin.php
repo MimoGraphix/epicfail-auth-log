@@ -40,19 +40,29 @@ class LogSuccessfulLogin
         $user = $event->user;
         $ip = $this->request->ip();
         $userAgent = $this->request->userAgent();
-        $location = (new GeoLocateService)->getLocationByIpAddress($ip);
-        $known = $user->authentications()->whereIpAddress($ip)->whereUserAgent($userAgent)->first();
+        $remember = $event->remember;
+        $guard = $event->guard;
+        $session_key = session()->getId();
+		$location = (new GeoLocateService)->getLocationByIpAddress($ip);
+
+		$known = $user->authentications()->whereIpAddress($ip)->whereUserAgent($userAgent)->first();
 
         $authenticationLog = new AuthenticationLog([
+            'session_key' => $session_key,
             'ip_address' => $ip,
             'user_agent' => $userAgent,
+            'flag_remember' => $remember,
+            'guard' => $guard,
             'login_at' => Carbon::now(),
             'location' => $location,
         ]);
 
         $user->authentications()->save($authenticationLog);
 
-        if (! $known && config('authentication-log.notify')) {
+        if ( !$known && config('authentication-log.notify')) {
+        	if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )
+        		return ;
+
             if(config('authentication-log.has-email-validation') && $user->verified){
                 $user->notify(new NewDevice($authenticationLog));
             }

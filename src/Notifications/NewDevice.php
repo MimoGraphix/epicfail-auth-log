@@ -52,11 +52,12 @@ class NewDevice extends Notification
     {
         return (new MailMessage)
             ->subject(trans('authentication-log::messages.subject'))
-            ->markdown('authentication-log::emails.new', [
+            ->markdown( config( 'authentication-log.email-view' ), [
                 'account' => $notifiable,
                 'time' => $this->authenticationLog->login_at,
                 'ipAddress' => $this->authenticationLog->ip_address,
-                'browser' => $this->authenticationLog->user_agent,
+                'os' => $this->authenticationLog->getOs(),
+                'browser' => $this->authenticationLog->getBrowser(),
                 'location' => $this->authenticationLog->location,
             ]);
     }

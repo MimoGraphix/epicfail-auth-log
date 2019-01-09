@@ -46,4 +46,14 @@ return [
     |
     */
     'has-email-validation' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email view path
+    |--------------------------------------------------------------------------
+    |
+    | In case you want use custom Email Design
+    |
+    */
+	'email-view' => 'authentication-log::emails.new',
 ];

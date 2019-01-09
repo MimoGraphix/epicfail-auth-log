@@ -22,6 +22,16 @@ trait AuthenticationLogable
         return ['mail'];
     }
 
+    public function activeAuthentications()
+	{
+		return $this->authentications()->whereNull( 'logout_at' );
+	}
+
+    public function historyAuthentications()
+	{
+		return $this->authentications()->whereNotNull( 'logout_at' );
+	}
+
     /**
      * Get the entity's last login at.
      */
