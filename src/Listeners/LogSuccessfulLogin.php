@@ -49,8 +49,6 @@ class LogSuccessfulLogin
 		\DB::beginTransaction();
 		try
 		{
-			$known = $user->authentications()->whereIpAddress($ip)->whereUserAgent($userAgent)->first();
-
 			$authenticationLog = new AuthenticationLog([
 				'session_key' => $session_key,
 				'ip_address' => $ip,
@@ -60,6 +58,8 @@ class LogSuccessfulLogin
 				'login_at' => Carbon::now(),
 				'location' => $location,
 			]);
+
+			$known = $user->authentications()->where( 'comparison_hash', $authenticationLog->getComparisonHash() )->first();
 
 			$user->authentications()->save($authenticationLog);
 

@@ -20,6 +20,7 @@ class CreateAuthenticationLogTable extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->string('location')->nullable();
             $table->text('user_agent')->nullable();
+            $table->string('comparison_hash')->nullable();
             $table->boolean('flag_remember')->default( 0 );
             $table->string('guard', 25)->nullable( );
             $table->datetime( 'last_active' )->nullable( );

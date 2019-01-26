@@ -46,6 +46,7 @@ class AuthenticationLog extends Model
      */
     protected $hidden = [
         'session_key',
+        'comparison_hash',
     ];
 
 	private $_parsedBrowser = null;
@@ -104,5 +105,13 @@ class AuthenticationLog extends Model
 	public function isActual()
 	{
 		return $this->session_key == session()->getId();
+	}
+
+	public function getComparisonHash()
+	{
+		if( $this->comparison_hash != null )
+			return $this->comparison_hash;
+
+		return md5( $this->guard . "-" . $this->ip_address . "-" . $this->getBrowser() . "-" . $this->getOs() );
 	}
 }
