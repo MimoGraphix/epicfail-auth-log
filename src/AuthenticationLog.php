@@ -112,6 +112,8 @@ class AuthenticationLog extends Model
 		if( $this->comparison_hash != null )
 			return $this->comparison_hash;
 
-		return md5( $this->guard . "-" . $this->ip_address . "-" . $this->getBrowser() . "-" . $this->getOs() );
+		$this->comparison_hash = md5( $this->guard . "-" . $this->ip_address . "-" . $this->getBrowser() . "-" . $this->getOs() );
+
+		return $this->comparison_hash;
 	}
 }
