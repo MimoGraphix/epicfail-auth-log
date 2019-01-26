@@ -77,10 +77,7 @@ class LogSuccessfulLogin
         	if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )
         		return ;
 
-            if(config('authentication-log.has-email-validation') && $user->verified){
-                $user->notify(new NewDevice($authenticationLog));
-            }
-            else $user->notify(new NewDevice($authenticationLog));
+            $user->notify(new NewDevice($authenticationLog));
         }
     }
 }
