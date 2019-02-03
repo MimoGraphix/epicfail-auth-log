@@ -61,6 +61,7 @@ class LogAuthenticated
 
 				if( $known == null )
 				{
+					\DB::rollback();
 					Log::error( 'What The FUCK just happed?' );
 					return ;
 				}
