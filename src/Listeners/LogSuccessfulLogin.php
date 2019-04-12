@@ -69,7 +69,7 @@ class LogSuccessfulLogin
             }
             else
             {
-                response()->withCookie( cookie( )->forever( self::COOKIE, $authenticationLog->getComparisonHash() ) );
+                session()->push( self::COOKIE, $authenticationLog->getComparisonHash() );
             }
 
             $user->authentications()->save($authenticationLog);
