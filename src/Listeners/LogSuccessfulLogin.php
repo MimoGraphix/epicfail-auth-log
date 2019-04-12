@@ -12,6 +12,8 @@ use Yadahan\AuthenticationLog\Notifications\NewDevice;
 
 class LogSuccessfulLogin
 {
+    const COOKIE = "adiv";
+
     /**
      * The request.
      *
@@ -44,38 +46,43 @@ class LogSuccessfulLogin
         $remember = $event->remember;
         $guard = $event->guard;
         $session_key = session()->getId();
-		$location = (new GeoLocateService)->getLocationByIpAddress($ip);
+        $location = (new GeoLocateService)->getLocationByIpAddress($ip);
 
-		\DB::beginTransaction();
-		try
-		{
-			$authenticationLog = new AuthenticationLog([
-				'session_key' => $session_key,
-				'ip_address' => $ip,
-				'user_agent' => $userAgent,
-				'flag_remember' => $remember,
-				'guard' => $guard,
-				'login_at' => Carbon::now(),
-				'location' => $location,
-			]);
+        $known = false;
 
-			$known = $user->authentications()->where( 'comparison_hash', $authenticationLog->getComparisonHash() )->first();
+        \DB::beginTransaction();
+        try
+        {
+            if( $this->request->cookie( self::COOKIE ) )
+            {
+                $known = $user->authentications()->where( 'comparison_hash', $this->request->cookie( self::COOKIE ) )->first();
+            }
 
-			$user->authentications()->save($authenticationLog);
+            $authenticationLog = new AuthenticationLog([
+                'session_key' => $session_key,
+                'ip_address' => $ip,
+                'user_agent' => $userAgent,
+                'flag_remember' => $remember,
+                'guard' => $guard,
+                'login_at' => Carbon::now(),
+                'location' => $location,
+            ]);
 
-			\DB::commit();
-		}
-		catch ( \Exception $e )
-		{
-			\DB::rollback();
+            $user->authentications()->save($authenticationLog);
 
-			Log::error( $e );
-			return ;
-		}
+            \DB::commit();
+        }
+        catch ( \Exception $e )
+        {
+            \DB::rollback();
+
+            Log::error( $e );
+            return ;
+        }
 
         if ( !$known && config('authentication-log.notify')) {
-        	if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )
-        		return ;
+            if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )
+                return ;
 
             $user->notify(new NewDevice($authenticationLog));
         }
