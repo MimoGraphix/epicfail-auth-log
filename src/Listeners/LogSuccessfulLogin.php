@@ -53,11 +53,6 @@ class LogSuccessfulLogin
         \DB::beginTransaction();
         try
         {
-            if( $this->request->cookie( self::COOKIE ) )
-            {
-                $known = $user->authentications()->where( 'comparison_hash', $this->request->cookie( self::COOKIE ) )->first();
-            }
-
             $authenticationLog = new AuthenticationLog([
                 'session_key' => $session_key,
                 'ip_address' => $ip,
@@ -67,6 +62,15 @@ class LogSuccessfulLogin
                 'login_at' => Carbon::now(),
                 'location' => $location,
             ]);
+
+            if( $this->request->hasCookie( self::COOKIE ) )
+            {
+                $known = $user->authentications()->where( 'comparison_hash', $this->request->cookie( self::COOKIE ) )->first();
+            }
+            else
+            {
+                response()->withCookie( cookie( )->forever( self::COOKIE, $authenticationLog->getComparisonHash() ) );
+            }
 
             $user->authentications()->save($authenticationLog);
 
