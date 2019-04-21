@@ -71,7 +71,6 @@ class LogSuccessfulLogin
             {
                 session()->push( self::COOKIE, $authenticationLog->getComparisonHash() );
             }
-
             $user->authentications()->save($authenticationLog);
 
             \DB::commit();

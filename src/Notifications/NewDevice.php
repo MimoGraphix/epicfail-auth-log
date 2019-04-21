@@ -59,6 +59,7 @@ class NewDevice extends Notification
                 'os' => $this->authenticationLog->getOs(),
                 'browser' => $this->authenticationLog->getBrowser(),
                 'location' => $this->authenticationLog->location,
+                'comparison_hash' => $this->authenticationLog->comparison_hash,
             ]);
     }
 
