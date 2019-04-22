@@ -7,8 +7,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 class AuthenticationLogServiceProvider extends ServiceProvider
 {
-    use EventMap;
-
     /**
      * Bootstrap the application services.
      *
@@ -16,8 +14,6 @@ class AuthenticationLogServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerEvents();
-
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'authentication-log');
 
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'authentication-log');
@@ -40,22 +36,6 @@ class AuthenticationLogServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/authentication-log.php' => config_path('authentication-log.php'),
             ], 'authentication-log-config');
-        }
-    }
-
-    /**
-     * Register the Authentication Log's events.
-     *
-     * @return void
-     */
-    protected function registerEvents()
-    {
-        $events = $this->app->make(Dispatcher::class);
-
-        foreach ($this->events as $event => $listeners) {
-            foreach ($listeners as $listener) {
-                $events->listen($event, $listener);
-            }
         }
     }
 
