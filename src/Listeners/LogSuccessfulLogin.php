@@ -21,6 +21,8 @@ class LogSuccessfulLogin
      */
     public $request;
 
+    protected $newDeviceClass = NewDevice::class;
+
     /**
      * Create the event listener.
      *
@@ -87,7 +89,7 @@ class LogSuccessfulLogin
             if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )
                 return ;
 
-            $user->notify(new NewDevice($authenticationLog));
+            ($this->newDeviceClass)::dispatch( $user, $authenticationLog );
         }
     }
 }
