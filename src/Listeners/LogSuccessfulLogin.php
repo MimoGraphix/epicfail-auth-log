@@ -89,7 +89,8 @@ class LogSuccessfulLogin
             if( method_exists( $user, 'allowNewDeviceNotifications' ) && !$user->allowNewDeviceNotifications() )
                 return ;
 
-            ($this->newDeviceClass)::dispatch( $user, $authenticationLog );
+            $newDeviceClass = $this->newDeviceClass;
+            $user->notify( new $newDeviceClass( $authenticationLog ) );
         }
     }
 }
