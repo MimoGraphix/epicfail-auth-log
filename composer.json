@@ -22,8 +22,6 @@
         "illuminate/support": "~5.5"
     },
     "require-dev": {
-        "orchestra/database": "~3.5",
-        "orchestra/testbench": "~3.5",
         "phpunit/phpunit": "~6.0"
     },
     "autoload": {
@@ -42,10 +40,6 @@
                 "Yadahan\\AuthenticationLog\\AuthenticationLogServiceProvider"
             ]
         }
-    },
-    "suggest": {
-        "guzzlehttp/guzzle": "Required to use the Slack transport (~6.0)",
-        "nexmo/client": "Required to use the Nexmo transport (~1.0)."
     },
     "config": {
         "sort-packages": true
